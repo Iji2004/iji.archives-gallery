@@ -12,6 +12,7 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^7.4.0"
+    "astro": "^7.4.0",
+    "photoswipe": "^5.4.4"
   }
 }

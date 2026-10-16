@@ -1,11 +1,101 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import { Image, getImage } from 'astro:assets';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Load every photo in src/assets/photos, sorted by file name
+const files = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/photos/*.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+
+const photos = await Promise.all(
+  Object.keys(files).sort().map(async (path) => {
+    const img = files[path].default;
+    // Large version for the fullscreen lightbox
+    const width = Math.min(2000, img.width);
+    const height = Math.round((width * img.height) / img.width);
+    const full = await getImage({ src: img, width, format: 'webp' });
+    return { img, full, width, height };
+  })
+);
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Luigi Alba | Photography</title>
+
+    <style is:global>
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        background: #0a0a0a;
+        color: #f5f5f5;
+        font-family: system-ui, sans-serif;
+      }
+
+      header { padding: 3rem 1rem; text-align: center; }
+      header h1 { margin: 0; font-size: 1.9rem; font-weight: 600; }
+      header p { margin: 0.5rem 0 0; color: #a3a3a3; }
+
+      /* Masonry grid: 2 columns on phones, 3 on bigger screens */
+      #gallery {
+        columns: 2;
+        column-gap: 0.75rem;
+        padding: 0 0.75rem 3rem;
+      }
+      @media (min-width: 768px) {
+        #gallery { columns: 3; }
+      }
+
+      #gallery a {
+        display: block;
+        margin-bottom: 0.75rem;
+        break-inside: avoid;
+      }
+      #gallery img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Luigi Alba</h1>
+      <p>Event and campus photography</p>
+    </header>
+
+    <main id="gallery">
+      {photos.map(({ img, full, width, height }) => (
+        <a
+          href={full.src}
+          data-pswp-width={width}
+          data-pswp-height={height}
+          target="_blank"
+        >
+          <Image
+            src={img}
+            alt="Photo by Luigi Alba"
+            widths={[400, 800]}
+            sizes="(min-width: 768px) 33vw, 50vw"
+          />
+        </a>
+      ))}
+    </main>
+
+    <script>
+      import PhotoSwipeLightbox from 'photoswipe/lightbox';
+      import 'photoswipe/style.css';
+
+      const lightbox = new PhotoSwipeLightbox({
+        gallery: '#gallery',
+        children: 'a',
+        pswpModule: () => import('photoswipe'),
+      });
+      lightbox.init();
+    </script>
+  </body>
+</html>
