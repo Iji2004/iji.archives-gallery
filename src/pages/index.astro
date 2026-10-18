@@ -1,5 +1,6 @@
 ---
 import { Image, getImage } from 'astro:assets';
+import profile from '../assets/Profile.jpg';
 
 // Load every photo in src/assets/photos, sorted by file name
 const files = import.meta.glob<{ default: ImageMetadata }>(
@@ -30,43 +31,185 @@ const photos = await Promise.all(
 
       body {
         margin: 0;
-        background: #0a0a0a;
-        color: #f5f5f5;
-        font-family: system-ui, sans-serif;
+        background: #ffffff;
+        color: #111111;
+        font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
       }
 
-      header { padding: 3rem 1rem; text-align: center; }
-      header h1 { margin: 0; font-size: 1.9rem; font-weight: 600; }
-      header p { margin: 0.5rem 0 0; color: #a3a3a3; }
+      /* Nav bar */
+      .site-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.25rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2.5rem 1.25rem 2rem;
+      }
+      .logo {
+        color: #111111;
+        font-size: 1rem;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        text-decoration: none;
+      }
+      .site-header nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem 1.75rem;
+      }
+      .site-header nav a {
+        color: #888888;
+        font-size: 0.8rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .site-header nav a:hover,
+      .site-header nav a.active {
+        color: #111111;
+      }
+
+      /* Profile section */
+      .profile {
+        display: grid;
+        gap: 2rem;
+        align-items: center;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1rem 1.25rem 4rem;
+      }
+      .profile-photo {
+        max-width: 420px;
+      }
+      .profile-photo img {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+      }
+      .profile-role {
+        margin: 0 0 0.75rem;
+        color: #888888;
+        font-size: 0.8rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+      .profile-text h1 {
+        margin: 0 0 1.5rem;
+        font-size: clamp(2.25rem, 6vw, 4.5rem);
+        font-weight: 300;
+        letter-spacing: -0.02em;
+        line-height: 1;
+      }
+      .profile-bio {
+        margin: 0 0 1.5rem;
+        max-width: 55ch;
+        color: #444444;
+        font-size: 1.05rem;
+        line-height: 1.7;
+      }
+      .profile-meta {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        color: #888888;
+        font-size: 0.9rem;
+        line-height: 1.9;
+      }
 
       /* Masonry grid: 2 columns on phones, 3 on bigger screens */
       #gallery {
         columns: 2;
-        column-gap: 0.75rem;
-        padding: 0 0.75rem 3rem;
+        column-gap: 0.5rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 1.25rem 4rem;
       }
-      @media (min-width: 768px) {
-        #gallery { columns: 3; }
-      }
-
       #gallery a {
         display: block;
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.5rem;
         break-inside: avoid;
       }
       #gallery img {
         display: block;
         width: 100%;
         height: auto;
-        border-radius: 4px;
+        transition: opacity 0.2s;
+      }
+      #gallery a:hover img {
+        opacity: 0.85;
+      }
+
+      footer {
+        padding: 2rem 1.25rem 3rem;
+        text-align: center;
+        color: #aaaaaa;
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+      }
+
+      /* Bigger screens */
+      @media (min-width: 768px) {
+        .profile {
+          grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+          gap: 5rem;
+          padding: 2rem 1.25rem 6rem;
+        }
+        .profile-photo {
+          max-width: none;
+        }
+        #gallery {
+          columns: 3;
+          column-gap: 1rem;
+        }
+        #gallery a {
+          margin-bottom: 1rem;
+        }
       }
     </style>
   </head>
   <body>
-    <header>
-      <h1>Luigi Alba</h1>
-      <p>Event and campus photography</p>
+    <header class="site-header">
+      <a href="/" class="logo">Luigi Alba</a>
+      <nav>
+        <a href="/" class="active">Gallery</a>
+        <a href="https://www.instagram.com/iji.archives/" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="/categories">Categories</a>
+        <a href="/contact">Contact</a>
+        <a href="/about">About</a>
+      </nav>
     </header>
+
+    <section class="profile">
+      <div class="profile-photo">
+        <Image
+          src={profile}
+          alt="Luigi Alba"
+          widths={[400, 800, 1200]}
+          sizes="(min-width: 768px) 40vw, 100vw"
+          loading="eager"
+        />
+      </div>
+
+      <div class="profile-text">
+        <p class="profile-role">Events & Campus Photographer</p>
+        <h1>Luigi Alba</h1>
+        <p class="profile-bio">
+          I'm a photojournalist for TomasinoWeb and an IT student at the
+          University of Santo Tomas. I photograph campus events, concerts and
+          the people who make them happen.
+        </p>
+        <ul class="profile-meta">
+          <li>Based in Metro Manila</li>
+          <li>Available for event coverage</li>
+        </ul>
+      </div>
+    </section>
 
     <main id="gallery">
       {photos.map(({ img, full, width, height }) => (
@@ -86,6 +229,8 @@ const photos = await Promise.all(
       ))}
     </main>
 
+    <footer>© 2026 Luigi Alba</footer>
+
     <script>
       import PhotoSwipeLightbox from 'photoswipe/lightbox';
       import 'photoswipe/style.css';
@@ -94,6 +239,7 @@ const photos = await Promise.all(
         gallery: '#gallery',
         children: 'a',
         pswpModule: () => import('photoswipe'),
+        bgOpacity: 1,
       });
       lightbox.init();
     </script>
